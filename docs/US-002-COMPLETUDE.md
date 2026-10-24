@@ -71,3 +71,13 @@ La feuille facultative `Pieces_candidatures` du **classeur TEST** utilise les co
 **Limite importante :** il s'agit d'une **attestation déclarative issue du classeur TEST**, et non d'une vérification par Google Drive. Ni l'existence, ni les droits d'accès, ni l'authenticité du fichier ne sont vérifiés. Le raccordement direct à Drive, la preuve de contrôle et les habilitations restent à spécifier et tester avant utilisation réelle.
 
 La sortie du moteur comprend uniquement des indicateurs documentaires et identifiants techniques de candidatures. Ne pas afficher les `Drive_file_ID` dans les rapports.
+
+## Contrôle technique Drive — incrément 5
+
+`src/DriveMetadataAdapter.gs` expose `isAccessibleFile(fileId)` : cette fonction utilise **uniquement** `DriveApp.getFileById` et `file.isTrashed()`. Elle ne lit ni le contenu, ni les permissions, ni les noms des fichiers. Un accès refusé, un identifiant invalide ou un fichier à la corbeille retourne `false`, sans journaliser l'identifiant.
+
+**Activation explicite en test uniquement :** ajouter la propriété de script `ALLOW_TEST_DRIVE_METADATA_READ=YES`. En l'absence de ce paramètre, aucune requête Drive n'est exécutée et toutes les preuves documentaires restent non vérifiées (stratégie *fail closed*).
+
+La complétude documentaire exige désormais **simultanément** une attestation métier positive et un contrôle technique réussi. Cette vérification garantit seulement que le compte exécutant le script peut accéder à une référence de fichier non mise à la corbeille ; elle **ne prouve pas** l'authenticité, l'intégrité du contenu, le bon rattachement du document au candidat ou les droits de chaque utilisateur final.
+
+**Recette obligatoire avant production :** tester fichier fictif accessible, référence inexistante, accès refusé et corbeille ; examiner les scopes OAuth et les habilitations du compte d'exécution. Aucune autorisation d'accès Drive ne doit être étendue sans validation.
