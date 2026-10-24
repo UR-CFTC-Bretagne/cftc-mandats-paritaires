@@ -29,3 +29,14 @@ Pas de lecture du formulaire réel, pas d'envoi automatique, pas d'écriture de 
 
 ## Dépendance
 Cette branche part de la branche de US-001 ; une **Pull Request empilée** est créée vers celle-ci. La fusion de US-002 dans `main` devra intervenir seulement après validation de US-001 et revue de son socle.
+
+## Intégration en lecture seule — incrément 2
+
+- `src/CompletenessProjection.gs` : transforme les lignes des tables `Personnes` et `Candidatures` en dossier de diagnostic, sans inventer de données absentes.
+- `src/CompletenessService.gs` : lit uniquement le classeur **TARGET_TEST_SPREADSHEET_ID** via `SheetsRepository`, calcule un résumé agrégé et renvoie les diagnostics à l'appelant.
+- `simulerCompletudeCandidaturesTest()` : point d'entrée manuel réservé aux utilisateurs habilités du projet Apps Script de test.
+- `tests/completeness-projection.test.js` : projections, référence manquante, référentiel incohérent et immutabilité.
+
+**Attention :** US-001 stocke actuellement `Instance_ID` vide tant que le rapprochement avec les instances n'est pas réalisé. En conséquence, la politique de base signale ce champ comme manquant. Le moteur **n'interprète pas** un champ vide comme une instance vérifiée et ne peut pas rattacher automatiquement une pièce Drive. Les obligations documentaires restent à définir par instance.
+
+Le diagnostic n'écrit rien dans les tables sources et ne change jamais le statut de candidature. Son retour contient des identifiants techniques de candidatures et des intitulés de champs manquants ; restreindre l'accès à l'environnement de test et ne pas publier le résultat dans GitHub.
