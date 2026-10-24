@@ -88,3 +88,19 @@ test('document facultatif validé permet instruction',()=>{
  const r=projection.inspectRows([person],[row],policy,domain,validInstances,rules);
  assert.equal(r[0].status,'PRET_A_INSTRUIRE');
 });
+
+const evidence=require('../src/DocumentEvidence.gs');
+test('pièce validée via métadonnées permet le diagnostic de complétude',()=>{
+ const row=[...app];row[4]='I-1';
+ const rules=requirements.fromRows([['I-1','accord','Accord écrit','oui','oui']]);
+ const attestation=evidence.fromRows([['C-1','accord','FAUX-ID-TEST','present','oui']]);
+ const r=projection.inspectRows([person],[row],policy,domain,validInstances,rules,attestation);
+ assert.equal(r[0].status,'PRET_A_INSTRUIRE');
+});
+test('pièce non validée reste manquante malgré une référence',()=>{
+ const row=[...app];row[4]='I-1';
+ const rules=requirements.fromRows([['I-1','accord','Accord écrit','oui','oui']]);
+ const attestation=evidence.fromRows([['C-1','accord','FAUX-ID-TEST','present','non']]);
+ const r=projection.inspectRows([person],[row],policy,domain,validInstances,rules,attestation);
+ assert.equal(r[0].status,'INCOMPLET');
+});
