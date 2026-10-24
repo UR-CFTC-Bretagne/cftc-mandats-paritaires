@@ -2,7 +2,8 @@
 const MandatsDocumentEvidence=(()=>{
  const HEADERS=Object.freeze(['CAND_ID','Document_code','Drive_file_ID','Controle','Validation_metier']);
  const norm=v=>String(v==null?'':v).trim().toLocaleLowerCase('fr');
- function fromRows(rows, verifyFile){
+ function fromRows(rows, verifyFile, allowedCandidatures){
+  const allowed=allowedCandidatures ? new Set(allowedCandidatures.map(v=>String(v||'').trim())) : null;
   if(!Array.isArray(rows))throw new Error('Métadonnées documentaires invalides');
   const byCandidate=new Map(),seen=new Set();
   for(const row of rows){
@@ -10,6 +11,7 @@ const MandatsDocumentEvidence=(()=>{
    const id=String(row[0]||'').trim(),code=String(row[1]||'').trim(),fileId=String(row[2]||'').trim();
    const control=norm(row[3]),validated=norm(row[4]);
    if(!id||!code)throw new Error('Référence documentaire incomplète');
+   if(allowed && !allowed.has(id))throw new Error('Justificatif rattaché à une candidature inconnue');
    const key=id+'|'+code;
    if(seen.has(key))throw new Error('Référence documentaire dupliquée');
    seen.add(key);
@@ -18,7 +20,10 @@ const MandatsDocumentEvidence=(()=>{
    // A file reference is only usable after an explicit business validation.
    // This does not verify Drive permissions, existence, content or authenticity.
    const attested=!!fileId&&control==='present'&&validated==='oui';
-   const usable=attested && typeof verifyFile==='function' && verifyFile(fileId)===true;
+   let usable=false;
+   if(attested && typeof verifyFile==='function'){
+    try{usable=verifyFile(fileId)===true;}catch(_error){usable=false;}
+   }
    const dossier=byCandidate.get(id)||{};
    dossier[code]=usable ? true : false;
    byCandidate.set(id,dossier);
