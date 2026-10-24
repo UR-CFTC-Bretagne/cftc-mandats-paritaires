@@ -5,7 +5,7 @@ const MandatsCompletenessService = (() => {
   function evaluateSnapshot(people, applications, instanceRows, requirementRows, evidenceRows, verifyFile) {
     const registry=MandatsInstanceRegistry.fromRows(instanceRows || []);
     const requirements=MandatsInstanceRequirements.fromRows(requirementRows || []);
-    const evidence=MandatsDocumentEvidence.fromRows(evidenceRows || [],verifyFile);
+    const evidence=MandatsDocumentEvidence.fromRows(evidenceRows || [],verifyFile,applications.map(row=>row[0]));
     return P.inspectRows(people,applications,Policy,D,registry,requirements,evidence);
   }
   function simulationTest() {
