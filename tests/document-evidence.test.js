@@ -12,3 +12,19 @@ test('aucune fuite de Drive_file_ID dans le dossier projeté',()=>assert.deepEqu
 test('sans autorisation technique les justificatifs restent non vérifiés',()=>assert.equal(E.fromRows([row]).forCandidature('C-1').accord,false));
 test('Drive inaccessible refuse la preuve',()=>assert.equal(E.fromRows([row],()=>false).forCandidature('C-1').accord,false));
 test('vérificateur non appelé lorsque validation métier manque',()=>{let called=false;E.fromRows([[...row.slice(0,4),'non']],()=>{called=true;return true;});assert.equal(called,false);});
+
+test('refuse une pièce rattachée à une candidature inconnue',()=>{
+ assert.throws(()=>E.fromRows([row],()=>true,['AUTRE-CAND']),/candidature inconnue/);
+});
+test('accepte le rattachement uniquement sur CAND_ID autorisé',()=>{
+ assert.equal(E.fromRows([row],()=>true,['C-1']).forCandidature('C-1').accord,true);
+});
+test('échec du contrôle technique ne propage ni identité ni exception',()=>{
+ const result=E.fromRows([row],()=>{throw new Error('détail sensible du fournisseur');},['C-1']);
+ assert.equal(result.forCandidature('C-1').accord,false);
+});
+test('aucune requête Drive en cas de pièce non déclarée présente',()=>{
+ let called=0;
+ E.fromRows([['C-1','accord','TEST','absent','oui']],()=>{called++;return true;},['C-1']);
+ assert.equal(called,0);
+});
