@@ -27,7 +27,7 @@ const MandatsDecisionService=(()=>{
  function saveDraftTest(input,actor){
   if(PropertiesService.getScriptProperties().getProperty('ALLOW_TEST_DECISION_WRITES')!=='YES')
     throw Error('Écriture de décisions TEST non autorisée');
-  if(typeof actor!=='string'||!actor.trim())throw Error('Acteur technique requis');
+  if(typeof actor!=='string'||!actor.trim()||/^[=+@-]/.test(actor.trim()))throw Error('Acteur technique invalide');
   const lock=LockService.getScriptLock();
   if(!lock.tryLock(30000))throw Error('Une autre opération est en cours');
   try{
