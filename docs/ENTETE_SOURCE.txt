@@ -1,0 +1,5 @@
+/**
+ * Copyright 2026 Union Régionale CFTC Bretagne
+ * SPDX-License-Identifier: Apache-2.0
+ * Projet d'origine : https://github.com/UR-CFTC-Bretagne/cftc-mandats-paritaires
+ */
