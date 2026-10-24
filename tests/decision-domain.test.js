@@ -29,3 +29,6 @@ test('modification construit un événement d’audit sans exposer les anciennes
 test('aucune mutation des données soumises',()=>{
  const v=input(),before=JSON.stringify(v);D.propose(v,[]);assert.equal(JSON.stringify(v),before);
 });
+
+test('refuse une formule Sheets dans la référence PV',()=>assert.throws(()=>D.validate({...input(),referencePV:'=IMPORTXML("url")'}),/Valeur interdite/));
+test('refuse un texte de décision démarrant par un opérateur Sheets',()=>assert.throws(()=>D.validate({...input(),autorite:'+cmd'}),/Valeur interdite/));
