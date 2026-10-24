@@ -1,22 +1,40 @@
-# Crédit et attribution
+# Attribution — Union Régionale CFTC Bretagne
 
-Ce projet est mis à disposition sous **licence Apache 2.0**.
+## Licence du logiciel
 
-**Crédit d'origine à conserver lors d'une redistribution**, selon les modalités
-prévues par la licence et le fichier `NOTICE` :
+Le code du projet **CFTC Mandats Paritaires** est proposé sous les termes de
+l'[Apache License, Version 2.0](LICENSE), sous réserve des droits détenus par les
+différents contributeurs.
 
-> Application de gestion des mandats paritaires — projet initié par l'Union Régionale CFTC Bretagne (2026).  
-> Source : https://github.com/UR-CFTC-Bretagne/cftc-mandats-paritaires
+Copyright © 2026 Union Régionale CFTC Bretagne.
 
-Les redistributions et adaptations doivent conserver la licence, les mentions
-de droit d'auteur applicables et le contenu du fichier `NOTICE` dans l'une des
-formes autorisées par la section 4 de la licence Apache 2.0. Les fichiers
-modifiés doivent signaler qu'ils ont été modifiés.
+Projet d'origine : https://github.com/UR-CFTC-Bretagne/cftc-mandats-paritaires
 
-**Attention :** cette licence ne contraint pas tout réutilisateur à afficher
-une bannière « UR CFTC Bretagne » sur chaque écran de son application. Elle
-impose la conservation des mentions d'attribution dans les conditions décrites.
+## Comment créditer l'origine
 
-Les données personnelles et les documents confidentiels ne font pas partie du
-code open source. Les logos et marques CFTC ne sont pas autorisés à l'usage par
-ce texte.
+Dans toute redistribution où l'attribution est requise par la licence,
+conserver les avis applicables du fichier [NOTICE](NOTICE), les mentions de
+copyright présentes dans les fichiers sources et une copie de la licence.
+
+Mention recommandée dans la documentation d'une version dérivée :
+
+> Basé sur le projet « CFTC Mandats Paritaires », initié par l'Union Régionale
+> CFTC Bretagne — https://github.com/UR-CFTC-Bretagne/cftc-mandats-paritaires
+
+La section 4 de la licence précise les obligations en cas de redistribution
+et la signalisation des fichiers modifiés. Elle n'impose **pas** une bannière
+permanente dans chaque écran de l'application.
+
+## Marques, confidentialité et limites
+
+La licence du code n'autorise pas l'utilisation des noms, marques et logos
+de la CFTC au-delà des usages nécessaires à l'attribution et à la description
+raisonnable de l'origine du logiciel. Aucun soutien de l'UR CFTC Bretagne à
+une adaptation tierce ne peut en être déduit.
+
+Les données personnelles de candidatures, les pièces justificatives, les
+identifiants de connexion et les documents internes **ne sont pas publiés
+sous cette licence**.
+
+L'UR doit vérifier la titularité des droits et les éventuelles dépendances
+tierces avant de diffuser un ensemble logiciel complet.
