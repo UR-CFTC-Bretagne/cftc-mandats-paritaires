@@ -83,3 +83,11 @@ La complétude documentaire exige désormais **simultanément** une attestation 
 **Recette obligatoire avant production :** tester fichier fictif accessible, référence inexistante, accès refusé et corbeille ; examiner les scopes OAuth et les habilitations du compte d'exécution. Aucune autorisation d'accès Drive ne doit être étendue sans validation.
 
 **Blocage d'habilitation identifié :** le manifeste actuel `appsscript.json` ne déclare que la portée OAuth Google Sheets. Le contrôle Drive ne doit donc **pas être activé sur un déploiement réel** avant revue de sécurité, ajout approuvé du scope requis et validation des consentements utilisateurs. Dans cet état, l'accès Drive peut échouer et la preuve demeure absente ; c'est un comportement sûr et attendu. L'intégration n'est pas homologuée.
+
+## Intégrité du rattachement candidature ↔ justificatif — incrément 6
+
+Avant toute vérification technique, les lignes de `Pieces_candidatures` sont rapprochées des `CAND_ID` réellement présents dans la table `Candidatures`. Une référence documentaire orpheline bloque la simulation et nécessite un examen humain. Aucun rattachement par nom, prénom, courriel ou nom de fichier n'est utilisé.
+
+Le vérificateur Drive est injecté comme dépendance et ses erreurs sont traitées en **échec conservateur** : une exception du service n'est ni réémise ni journalisée avec des identifiants. Aucune lecture Drive n'est effectuée si l'attestation métier est absente ou négative. Des tests automatisés vérifient ces garanties.
+
+**À confirmer avant recette métier :** qui atteste que le fichier accessible correspond bien à la candidature concernée, et quelle preuve de cette vérification doit être conservée. Le lien technique par `CAND_ID` seul ne démontre pas le contenu ni le titulaire du document.
