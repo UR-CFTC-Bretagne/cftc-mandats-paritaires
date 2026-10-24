@@ -2,10 +2,11 @@
 const MandatsCompletenessService = (() => {
   const C=MANDATS_CONFIG,R=MandatsSheetsRepository,D=MandatsCompletenessDomain;
   const P=MandatsCompletenessProjection,Policy=MandatsCompletenessPolicy;
-  function evaluateSnapshot(people, applications, instanceRows, requirementRows) {
+  function evaluateSnapshot(people, applications, instanceRows, requirementRows, evidenceRows) {
     const registry=MandatsInstanceRegistry.fromRows(instanceRows || []);
     const requirements=MandatsInstanceRequirements.fromRows(requirementRows || []);
-    return P.inspectRows(people,applications,Policy,D,registry,requirements);
+    const evidence=MandatsDocumentEvidence.fromRows(evidenceRows || []);
+    return P.inspectRows(people,applications,Policy,D,registry,requirements,evidence);
   }
   function simulationTest() {
     // Restriction temporaire explicite : seul le classeur cible de TEST de US-001.
@@ -18,7 +19,9 @@ const MandatsCompletenessService = (() => {
     const instanceRows=R.readTable(instanceSheet,MandatsInstanceRegistry.HEADERS);
     const requirementsSheet=book.getSheetByName('Exigences_instances');
     const requirementsRows=R.readTable(requirementsSheet,MandatsInstanceRequirements.HEADERS);
-    const diagnostics=evaluateSnapshot(persons,applications,instanceRows,requirementsRows);
+    const evidenceSheet=book.getSheetByName('Pieces_candidatures');
+    const evidenceRows=R.readTable(evidenceSheet,MandatsDocumentEvidence.HEADERS);
+    const diagnostics=evaluateSnapshot(persons,applications,instanceRows,requirementsRows,evidenceRows);
     const summary={total:diagnostics.length,INCOMPLET:0,A_VERIFIER:0,
       PRET_A_INSTRUIRE:0,ANOMALIE_REFERENTIEL:0};
     for(const row of diagnostics)summary[row.status]++;
