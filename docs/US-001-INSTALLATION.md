@@ -33,7 +33,9 @@
 - Deux réponses indiscernables (mêmes nom, prénom, courriel et horodatage) sont **rejetées** pour arbitrage humain. Cette solution n'est pas un identifiant natif immuable Google Forms.
 - Modifier l'identité, l'horodatage ou le format d'affichage de la date **change l'empreinte** et peut conduire à un nouvel import : il faut figer les formats et prévoir un mécanisme natif de suivi des modifications avant production.
 - Les modifications a posteriori d'une réponse existante ne sont pas réconciliées.
-- Une panne entre plusieurs écritures peut laisser une personne orpheline : les écritures Google Sheets ne sont pas transactionnelles.
+- Les écritures Sheets ne sont pas transactionnelles : une personne peut être créée avant l'échec de sa candidature. La relance la réutilise si l'identité et le courriel concordent ; ne jamais supprimer automatiquement une personne orpheline.
+- Après une candidature écrite mais un journal d'audit interrompu, une exécution ultérieure rétablit la trace par l'action `RECONCILIATION`. Cette reconstruction n'est pas une preuve indépendante de l'action originale.
+- Un `Source_ID` dupliqué dans le référentiel provoque désormais une erreur bloquante ; vérifier manuellement les duplications.
 - L'instance textuelle n'est pas liée à `Instance_ID` : rapprochement métier à développer, ne rien inventer.
 - En-têtes réels non encore confirmés : compléter le mapping avant recette.
 - Aucun envoi automatique, décision officielle ou génération de mandat n'est effectué.
@@ -44,3 +46,11 @@
 - [ ] Interrompre volontairement l'import après l'ajout d'une personne, puis relancer : aucune seconde personne ne doit être créée.
 - [ ] Tester un échec d'ajout au journal d'audit : l'opération doit être rapprochée avec la candidature persistée.
 - [ ] Vérifier qu'une modification de date ou d'identité en source est signalée et traitée manuellement, et non silencieusement assimilée à une nouvelle candidature.
+
+## Reprise et intégrité (incrément 2)
+- [ ] Provoquer un échec après création de la personne mais avant la candidature : après relance, une seule personne et une seule candidature.
+- [ ] Provoquer un échec après création de la candidature mais avant l'audit : après relance, aucune candidature supplémentaire et une ligne `RECONCILIATION` dans `Audit_Imports`.
+- [ ] Introduire artificiellement deux `Source_ID` identiques dans la table de test : simulation et import doivent être bloqués.
+- [ ] Refaire le même import après réconciliation : aucune nouvelle ligne d'audit ne doit être créée.
+
+La recette réelle sur Google Workspace reste **à effectuer**. Ne pas utiliser cet incrément en production.
