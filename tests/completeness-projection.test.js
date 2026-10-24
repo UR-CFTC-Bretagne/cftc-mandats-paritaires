@@ -93,7 +93,7 @@ const evidence=require('../src/DocumentEvidence.gs');
 test('pièce validée via métadonnées permet le diagnostic de complétude',()=>{
  const row=[...app];row[4]='I-1';
  const rules=requirements.fromRows([['I-1','accord','Accord écrit','oui','oui']]);
- const attestation=evidence.fromRows([['C-1','accord','FAUX-ID-TEST','present','oui']]);
+ const attestation=evidence.fromRows([['C-1','accord','FAUX-ID-TEST','present','oui']],()=>true);
  const r=projection.inspectRows([person],[row],policy,domain,validInstances,rules,attestation);
  assert.equal(r[0].status,'PRET_A_INSTRUIRE');
 });
@@ -103,4 +103,12 @@ test('pièce non validée reste manquante malgré une référence',()=>{
  const attestation=evidence.fromRows([['C-1','accord','FAUX-ID-TEST','present','non']]);
  const r=projection.inspectRows([person],[row],policy,domain,validInstances,rules,attestation);
  assert.equal(r[0].status,'INCOMPLET');
+});
+
+test('preuve documentaire sans vérification technique : diagnostic incomplet',()=>{
+ const row=[...app];row[4]='I-1';
+ const rules=requirements.fromRows([['I-1','accord','Accord écrit','oui','oui']]);
+ const attestation=evidence.fromRows([['C-1','accord','FAUX-ID-TEST','present','oui']]);
+ const result=projection.inspectRows([person],[row],policy,domain,validInstances,rules,attestation);
+ assert.equal(result[0].status,'INCOMPLET');
 });
