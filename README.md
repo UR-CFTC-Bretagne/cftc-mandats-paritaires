@@ -10,12 +10,15 @@ Synchroniser les réponses Google Forms avec un référentiel central de **test 
 
 - `src/Config.gs` — configuration, en-têtes et schémas.
 - `src/ImportDomain.gs` — validation, dédoublonnage et règles métier testables.
-- `src/ImportService.gs` — lecture Google Forms, simulation et import dans un classeur TEST.
+- `src/ImportService.gs` — orchestration des cas d'usage et simulation.
+- `src/SheetsRepository.gs` — accès aux feuilles et à leurs schémas.
+- `src/ImportSettings.gs` — paramètres d'environnement Google Apps Script.
 - `src/Menu.gs` — accès à la simulation en lecture seule.
 - `tests/` — tests unitaires de l'US-001 avec données fictives.
 - `scripts/` — contrôle syntaxique des fichiers Apps Script.
 - `.github/workflows/ci.yml` — vérifications automatiques.
 - `docs/US-001-INSTALLATION.md` — installation et recette.
+- `docs/ARCHITECTURE.md` — décisions d'architecture et règles de contribution.
 
 ### Tests
 
