@@ -28,3 +28,36 @@ Le module ne lit aucun PV Drive, ne vérifie pas une autorité réelle, ne réal
 ## Dépendance
 
 La branche US-003 est empilée sur US-002, elle-même dépendante de US-001. Ne pas fusionner dans `main` sans recettes et validations préalables.
+
+## Incrément 2 — stockage dans un classeur de TEST
+
+Le code fournit `MandatsDecisionService.simulate(input)` (lecture seule) et `MandatsDecisionService.saveDraftTest(input,actor)` (écriture de brouillon uniquement).
+
+**Protection des écritures :** la propriété de script `ALLOW_TEST_DECISION_WRITES=YES` doit être ajoutée **explicitement**, exclusivement dans l'environnement de développement/recette. Sans cette valeur exacte, l'écriture est interdite. Le classeur est celui de `TARGET_TEST_SPREADSHEET_ID` et doit être distinct de `SOURCE_SPREADSHEET_ID`.
+
+### Tables proposées dans le classeur TEST
+
+`Decisions` : `DECISION_ID`, `CAND_ID`, `Autorite`, `Date_decision`, `Resultat`, `Reference_PV`, `Drive_justificatif_ID`, `Competence_verifiee`, `Justificatif_verifie`, `Candidature_verifiee`, `Etat`, `Cree_le`.
+
+`Audit_Decisions` : `EVENT_ID`, `Date`, `DECISION_ID`, `Action`, `Acteur`, `Champs`, `Statut`.
+
+L'adaptateur vérifie les identifiants des candidatures, l'absence de `DECISION_ID` dupliqué et l'absence d'événement d'audit existant pour la décision avant tout enregistrement. L'écriture est protégée par `LockService`.
+
+### Réconciliation obligatoire
+
+Le code écrit une **intention** d'audit (`INTENTION`) avant la ligne de décision, puis un événement de succès (`TERMINE`). Les tables Google Sheets **ne sont pas transactionnelles** : si une opération s'interrompt entre les écritures, un audit ou un brouillon peut rester partiel. Une nouvelle tentative portant le même `DECISION_ID` est bloquée et la reprise nécessite un contrôle humain.
+
+Cet audit est une première **piste d'audit append-only applicative**, non une garantie d'inaltérabilité technique ou réglementaire. Les révocations, modifications et historiques de versions ne sont pas encore implémentés. Aucun envoi ou désignation officielle n'est déclenché.
+
+Le code rejette les valeurs textuelles susceptibles d'être interprétées comme une formule dans Google Sheets. Les tests sont fictifs ; aucune recette réelle Workspace n'est présumée.
+
+### Scénarios de recette nécessaires
+
+1. Sans flag d'écriture : opération refusée.
+2. Avec données fictives : créer un brouillon et deux lignes d'audit, sans désignation.
+3. Candidature inconnue : opération refusée avant toute écriture.
+4. Doublon décision ou audit partiel : opération refusée et réconciliation manuelle.
+5. Feuille au schéma incompatible : opération interrompue.
+6. Vérification des droits d'édition, de la séparation TEST/production et des informations d'identification de l'acteur.
+
+**Restriction :** ne pas activer la fonction de sauvegarde dans le projet Apps Script réel tant que l'autorité compétente, la gestion des droits, la politique de conservation et les règles d'audit n'ont pas été validées.
