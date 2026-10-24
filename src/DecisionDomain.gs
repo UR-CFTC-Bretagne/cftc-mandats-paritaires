@@ -12,6 +12,7 @@ const MandatsDecisionDomain=(()=>{
   for(const key of fields){
    v[key]=clean(input[key]);
    if(!v[key])throw Error('Champ obligatoire manquant : '+key);
+   if(/^[=+@]/.test(v[key]) || (v[key].startsWith('-') && key!=='date'))throw Error('Valeur interdite pour une cellule Sheets : '+key);
   }
   if(!RESULTATS.includes(v.resultat))throw Error('Résultat de décision non autorisé');
   if(!validDate(v.date))throw Error('Date de décision invalide');
