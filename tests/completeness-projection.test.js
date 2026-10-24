@@ -42,3 +42,28 @@ test('projection ne modifie ni personnes ni candidatures',()=>{
  projection.inspectRows([person],[app],policy,domain);
  assert.equal(JSON.stringify({person,app}),before);
 });
+
+const instanceRegistry = require('../src/InstanceRegistry.gs');
+const validInstances = instanceRegistry.fromRows([['I-1','Instance fictive','Paritaire','oui','oui']]);
+test('instance validée et active permet un diagnostic prêt à instruire',()=>{
+ const updated=[...app];updated[4]='I-1';
+ const r=projection.inspectRows([person],[updated],policy,domain,validInstances);
+ assert.equal(r[0].status,'PRET_A_INSTRUIRE');
+});
+test('identifiant inconnu ne rend jamais un dossier complet',()=>{
+ const updated=[...app];updated[4]='inconnu';
+ const r=projection.inspectRows([person],[updated],policy,domain,validInstances);
+ assert.equal(r[0].status,'INCOMPLET');
+ assert.equal(r[0].missing[0].key,'instance');
+});
+test('instance inactive ou non validée ne rend pas le dossier complet',()=>{
+ const updated=[...app];updated[4]='I-2';
+ const registry=instanceRegistry.fromRows([['I-2','Instance fictive','Paritaire','non','oui']]);
+ assert.equal(projection.inspectRows([person],[updated],policy,domain,registry)[0].status,'INCOMPLET');
+ const nonValidated=instanceRegistry.fromRows([['I-2','Instance fictive','Paritaire','oui','non']]);
+ assert.equal(projection.inspectRows([person],[updated],policy,domain,nonValidated)[0].status,'INCOMPLET');
+});
+test('registre vide conserve une approche prudente',()=>{
+ const updated=[...app];updated[4]='I-1';
+ assert.equal(projection.inspectRows([person],[updated],policy,domain,instanceRegistry.fromRows([]))[0].status,'INCOMPLET');
+});
