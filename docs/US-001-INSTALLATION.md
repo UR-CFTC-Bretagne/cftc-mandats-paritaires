@@ -29,9 +29,18 @@
 8. Désactiver immédiatement `ALLOW_TEST_IMPORT_WRITES`.
 
 ## Limites connues — pas de déploiement en production
-- `Source_ID` utilise l'ID de feuille et le numéro de ligne : ne jamais trier, déplacer ou supprimer les réponses du formulaire.
+- `Source_ID` est désormais une empreinte SHA-256 de l'ID technique de feuille, du courriel, du nom, du prénom et de l'horodatage. L'ordre des lignes n'intervient plus dans cette clé.
+- Deux réponses indiscernables (mêmes nom, prénom, courriel et horodatage) sont **rejetées** pour arbitrage humain. Cette solution n'est pas un identifiant natif immuable Google Forms.
+- Modifier l'identité, l'horodatage ou le format d'affichage de la date **change l'empreinte** et peut conduire à un nouvel import : il faut figer les formats et prévoir un mécanisme natif de suivi des modifications avant production.
 - Les modifications a posteriori d'une réponse existante ne sont pas réconciliées.
 - Une panne entre plusieurs écritures peut laisser une personne orpheline : les écritures Google Sheets ne sont pas transactionnelles.
 - L'instance textuelle n'est pas liée à `Instance_ID` : rapprochement métier à développer, ne rien inventer.
 - En-têtes réels non encore confirmés : compléter le mapping avant recette.
 - Aucun envoi automatique, décision officielle ou génération de mandat n'est effectué.
+
+## Scénarios de recette complémentaires
+- [ ] Trier les lignes de la feuille source dans une copie de test ; aucune candidature déjà importée ne doit être créée à nouveau.
+- [ ] Ajouter deux réponses strictement identiques : les deux doivent être rejetées et l'import arrêté.
+- [ ] Interrompre volontairement l'import après l'ajout d'une personne, puis relancer : aucune seconde personne ne doit être créée.
+- [ ] Tester un échec d'ajout au journal d'audit : l'opération doit être rapprochée avec la candidature persistée.
+- [ ] Vérifier qu'une modification de date ou d'identité en source est signalée et traitée manuellement, et non silencieusement assimilée à une nouvelle candidature.
