@@ -67,3 +67,24 @@ test('registre vide conserve une approche prudente',()=>{
  const updated=[...app];updated[4]='I-1';
  assert.equal(projection.inspectRows([person],[updated],policy,domain,instanceRegistry.fromRows([]))[0].status,'INCOMPLET');
 });
+
+const requirements=require('../src/InstanceRequirements.gs');
+test('absence de règles validées interdit prêt à instruire',()=>{
+ const row=[...app];row[4]='I-1';
+ const r=projection.inspectRows([person],[row],policy,domain,validInstances,requirements.fromRows([]));
+ assert.equal(r[0].status,'A_VERIFIER');
+ assert.equal(r[0].verificationPending[0].key,'regles_documentaires');
+});
+test('document requis non présent => incomplet',()=>{
+ const row=[...app];row[4]='I-1';
+ const rules=requirements.fromRows([['I-1','autorisation','Autorisation','oui','oui']]);
+ const r=projection.inspectRows([person],[row],policy,domain,validInstances,rules);
+ assert.equal(r[0].status,'INCOMPLET');
+ assert.equal(r[0].missing[0].key,'autorisation');
+});
+test('document facultatif validé permet instruction',()=>{
+ const row=[...app];row[4]='I-1';
+ const rules=requirements.fromRows([['I-1','info','Information','non','oui']]);
+ const r=projection.inspectRows([person],[row],policy,domain,validInstances,rules);
+ assert.equal(r[0].status,'PRET_A_INSTRUIRE');
+});
