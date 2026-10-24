@@ -151,6 +151,12 @@ L'incrément de stockage US-003 propose deux tables de **TEST uniquement** — `
 
 **Documentation de référence : [modèle de données détaillé, colonnes, contraintes et hypothèses](docs/MODELE-DONNEES.md).** Toute modification du modèle doit mettre à jour cette spécification et les tests de non-régression.
 
+### 4.4 US-004 — Garde-fou des désignations (en développement)
+
+Le domaine `DesignationGuard.gs` définit des transitions préparatoires (`BROUILLON` → `EN_REVUE` → `VALIDEE` / `REFUSEE` / `AJOURNEE`). La validation d'une décision exige des contrôles explicites du dossier, de la compétence de l'autorité et des justificatifs adaptés à l'instance.
+
+**Aucun document officiel ni notification n'est autorisé par ce module**, même si les contrôles préalables sont satisfaits. Le workflow n'est pas encore enregistré dans Sheets : il nécessite un circuit d'habilitation, de validation humaine et d'audit avant mise en production. Voir [US-004 — garde-fou de désignation](docs/US-004-BLOCAGE-DESIGNATIONS.md).
+
 ## 5. Cahier des charges technique
 
 ### 5.1 Socle retenu
