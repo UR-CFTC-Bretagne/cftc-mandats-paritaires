@@ -1,17 +1,18 @@
-Application de gestion des mandats paritaires — CFTC Bretagne
+CFTC Mandats Paritaires — Application de coordination des mandats paritaires
 Copyright 2026 Union Régionale CFTC Bretagne
 
-Ce logiciel a été initié et développé dans le cadre du projet de coordination
-des réseaux de mandatés de l'Union Régionale CFTC Bretagne.
 Projet d'origine : https://github.com/UR-CFTC-Bretagne/cftc-mandats-paritaires
 
-Lors de la redistribution de ce logiciel ou de travaux dérivés, les mentions
-d'attribution ci-dessus doivent être conservées dans les conditions prévues
-par la section 4 de la licence Apache, version 2.0.
+Ce logiciel est initié dans le cadre de la coordination des réseaux de
+mandatés de l'Union Régionale CFTC Bretagne.
 
-Cette attribution n'implique aucun soutien, agrément ou partenariat de
-l'Union Régionale CFTC Bretagne concernant les adaptations réalisées par
-un tiers.
+Les redistributions du logiciel et des œuvres dérivées doivent conserver
+les avis d'attribution applicables de ce fichier NOTICE dans les formes
+prévues par la section 4(d) de l'Apache License, Version 2.0.
 
-Les noms, signes distinctifs et logos de la CFTC ne sont pas concédés
-par la licence du logiciel.
+Les contributions tierces demeurent soumises à leurs droits et mentions
+applicables, lorsqu'ils existent.
+
+Les noms, sigles, marques et logos CFTC ne sont pas couverts par la licence
+du code logiciel. La mention de l'UR CFTC Bretagne ne constitue pas une
+approbation, une certification ou un soutien des versions modifiées.
