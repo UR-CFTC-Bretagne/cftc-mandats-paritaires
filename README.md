@@ -127,6 +127,12 @@ Les cardinalités relatives aux **décisions et mandats** sont des hypothèses d
 
 Les tables US-002 sont prises en charge par le **code de développement**, sans validation d'un déploiement dans le classeur réel. Le champ `Instance_ID` n'est pas encore alimenté automatiquement par US-001. Le statut de complétude ne constitue jamais une décision de mandatement.
 
+### 4.3 US-003 — premier contrat de décision (en développement)
+
+La décision est distincte de la candidature et du mandat officiel. Le domaine `DecisionDomain.gs` vérifie la présence de l'autorité, de la date, du résultat (`VALIDATION`, `REFUS`, `AJOURNEMENT`), de la référence de PV et du justificatif, avec des confirmations métier explicites.
+
+**Le résultat initial est toujours un brouillon.** Même une décision complète et contrôlée n'autorise ni désignation ni notification automatique. Voir [US-003 — décisions](docs/US-003-DECISIONS.md).
+
 ### 4.3 Entités futures
 
 | Entité cible | Finalité | User stories |
