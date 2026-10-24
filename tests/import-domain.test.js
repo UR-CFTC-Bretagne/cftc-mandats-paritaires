@@ -9,3 +9,23 @@ test('rejette les courriels invalides',()=>assert.ok(d.record(['2026-01-01','Mar
 test('import puis synchronisation idempotente',()=>{const r=d.record(['2026-01-01','Martin','Alex','alex@example.org'],{date:0,nom:1,prenom:2,courriel:3},'1:2');assert.equal(d.evaluate(r,{},{}).action,'IMPORT');assert.equal(d.evaluate(r,{}, {'1:2':true}).action,'IGNORE');});
 test('refuse le rapprochement de personnes différentes',()=>{const r=d.record(['2026-01-01','Martin','Alex','alex@example.org'],{date:0,nom:1,prenom:2,courriel:3},'1:2');assert.equal(d.evaluate(r,{'alex@example.org':[{id:'X',nom:'Autre',prenom:'Alex'}]},{}).action,'REJET');});
 test('refuse les correspondances multiples',()=>{const r=d.record(['2026-01-01','Martin','Alex','alex@example.org'],{date:0,nom:1,prenom:2,courriel:3},'1:2');assert.equal(d.evaluate(r,{'alex@example.org':[{id:'1'},{id:'2'}]},{}).action,'REJET');});
+
+test('clé canonique identique indépendamment de la position de ligne',()=>{
+ const one=d.record(['2026-01-01','Martin','Alex','alex@example.org'],{date:0,nom:1,prenom:2,courriel:3},'A');
+ const two=d.record(['2026-01-01','Martin','Alex','alex@example.org'],{date:0,nom:1,prenom:2,courriel:3},'B');
+ assert.equal(d.identityKey(one.value),d.identityKey(two.value));
+});
+test('clé canonique normalise la casse et les accents',()=>{
+ assert.equal(d.identityKey({date:'2026-01-01',nom:'ÉVRARD',prenom:'Zoé',courriel:'ZOE@example.org'}),
+ d.identityKey({date:'2026-01-01',nom:'evrard',prenom:'zoe',courriel:'zoe@example.org'}));
+});
+test('rejet sécurisé de deux réponses indiscernables',()=>{
+ const r=d.record(['2026-01-01','Martin','Alex','alex@example.org'],{date:0,nom:1,prenom:2,courriel:3},'key');
+ const result=d.decideBatch([r,r],{},{});
+ assert.deepEqual(result.map(x=>x.action),['REJET','REJET']);
+});
+test('des dates différentes produisent des identités de soumission distinctes',()=>{
+ const a={date:'2026-01-01T09:00:00',nom:'Martin',prenom:'Alex',courriel:'alex@example.org'};
+ const b={...a,date:'2026-01-02T09:00:00'};
+ assert.notEqual(d.identityKey(a),d.identityKey(b));
+});
