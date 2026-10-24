@@ -204,6 +204,10 @@ Les futurs modules seront ajoutés **lors de la réalisation effective des stori
 
 [Consulter US-001](https://github.com/UR-CFTC-Bretagne/cftc-mandats-paritaires/issues/2) · [Revoir la PR #14](https://github.com/UR-CFTC-Bretagne/cftc-mandats-paritaires/pull/14) · [Procédure de test](docs/US-001-INSTALLATION.md)
 
+### Préparation de US-002 — contrôle de complétude
+
+Le diagnostic de complétude est développé de manière **indépendante et sans écriture** sur la branche `feature/US-002-controle-completude`. Le module `CompletenessDomain.gs` applique une politique configurable et distingue les informations manquantes des vérifications en attente. Les pièces obligatoires varient selon les instances et **ne sont pas présumées** ; elles devront être validées par le métier. Voir [la spécification US-002](docs/US-002-COMPLETUDE.md).
+
 ## 8. Méthode agile et gouvernance du développement
 
 - **Backlog vivant** dans les GitHub Issues : chaque exigence possède un identifiant, une priorité et des critères d'acceptation.
