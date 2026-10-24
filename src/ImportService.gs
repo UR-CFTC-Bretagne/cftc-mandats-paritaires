@@ -27,6 +27,13 @@ const MandatsImportService=(()=>{
   candRows.forEach(r=>{if(r[3])candidates[String(r[3])]=true;});
   return {people,candidates};
  }
+ function makeSourceId(sheetId,value){
+  const canonical=D.identityKey(value);
+  const digest=Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,
+    String(sheetId)+'|'+canonical,Utilities.Charset.UTF_8);
+  const hex=digest.map(b=>('0'+(b&255).toString(16)).slice(-2)).join('');
+  return 'forms-sha256:'+hex;
+ }
  function prepare(){
   const c=config(),source=SpreadsheetApp.openById(c.src).getSheetByName(C.SOURCE_SHEET);
   if(!source)throw new Error('Feuille Forms absente : '+C.SOURCE_SHEET);
@@ -37,13 +44,15 @@ const MandatsImportService=(()=>{
   const target=SpreadsheetApp.openById(c.dst);
   const idx=indexes(readTarget(target.getSheetByName(C.TARGET_PERSONNES),C.PERSON_HEADERS),
                     readTarget(target.getSheetByName(C.TARGET_CANDIDATURES),C.CAND_HEADERS));
-  const items=[];
-  sourceRows.slice(1).forEach((r,i)=>{
+  const records=[];
+  sourceRows.slice(1).forEach(r=>{
    if(r.every(cell=>!D.clean(cell)))return;
-   // Clé positionnelle : ne jamais trier, supprimer ou réordonner les réponses du formulaire.
-   const record=D.record(r,map.indices,String(source.getSheetId())+':'+String(i+2));
-   items.push({record,decision:D.evaluate(record,idx.people,idx.candidates)});
+   const record=D.record(r,map.indices,'');
+   record.value.sourceId=makeSourceId(source.getSheetId(),record.value);
+   records.push(record);
   });
+  const decisions=D.decideBatch(records,idx.people,idx.candidates);
+  const items=records.map((record,i)=>({record,decision:decisions[i]}));
   return {target,items};
  }
  function summary(items){
