@@ -35,6 +35,11 @@ const MandatsDecisionService=(()=>{
    // Validate against the existing TEST-only candidate registry before modifying tables.
    const initial=snapshot(book);
    Repo.validateSnapshot(initial.candidates,initial.decisions,initial.audits,proposed);
+   // An existing blank tab has no schema: refuse rather than append without headers.
+   for(const name of ['Decisions','Audit_Decisions']){
+    const existing=book.getSheetByName(name);
+    if(existing && existing.getLastRow()===0)throw Error('Feuille sans en-têtes : '+name);
+   }
    const decisions=MandatsSheetsRepository.ensureTable(book,'Decisions',Repo.DECISION_HEADERS);
    const audit=MandatsSheetsRepository.ensureTable(book,'Audit_Decisions',Repo.AUDIT_HEADERS);
    const now=new Date(),eventId=Utilities.getUuid();
