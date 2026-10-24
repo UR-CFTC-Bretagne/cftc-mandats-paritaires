@@ -24,6 +24,19 @@ const MandatsImportDomain = (() => {
     if(!value.date)errors.push('horodatage absent');
     return {value,errors};
   }
+  // Canonical key independent of row positions; reject ambiguous identical submissions.
+  function identityKey(value){
+    return [normalize(value.date),normalize(value.nom),normalize(value.prenom),normalize(value.courriel)].join('|');
+  }
+  function decideBatch(records, peopleByEmail, candidatesBySource){
+    const occurrences={};
+    records.forEach(r=>{const key=identityKey(r.value);occurrences[key]=(occurrences[key]||0)+1;});
+    return records.map(r=>{
+      const key=identityKey(r.value);
+      if(occurrences[key]>1)return {action:'REJET',reason:'plusieurs réponses avec la même identité et le même horodatage'};
+      return evaluate(r,peopleByEmail,candidatesBySource);
+    });
+  }
   function evaluate(record,peopleByEmail,candidatesBySource){
     if(record.errors.length)return {action:'REJET',reason:record.errors.join('; ')};
     const v=record.value;
@@ -34,6 +47,6 @@ const MandatsImportDomain = (() => {
       return {action:'REJET',reason:'identité différente pour ce courriel'};
     return {action:'IMPORT',personId:matches.length?matches[0].id:null};
   }
-  return Object.freeze({clean,normalize,emailValid,mapping,record,evaluate});
+  return Object.freeze({clean,normalize,emailValid,mapping,record,evaluate,identityKey,decideBatch});
 })();
 if(typeof module!=='undefined')module.exports=MandatsImportDomain;
