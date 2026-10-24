@@ -16,3 +16,6 @@ test('la fonction ne modifie pas son dossier',()=>{const p=base(),before=JSON.st
 test('politique dupliquée refusée',()=>assert.throws(()=>d.evaluate(base(),{fields:[policy.fields[0],policy.fields[0]],documents:[]}),/dupliquée/));
 test('pièce optionnelle n’empêche pas l’instruction',()=>assert.equal(d.evaluate(base(),{fields:policy.fields,documents:[{key:'option',label:'Option',required:false}]}).complete,true));
 test('aucun document obligatoire sans politique explicite',()=>assert.equal(d.evaluate(base(),{fields:policy.fields,documents:[]}).missingCount,0));
+
+test('une preuve booléenne false reste absente',()=>{const p=base();p.documents.accord=false;const r=d.evaluate(p,policy);assert.equal(r.status,'INCOMPLET');assert.equal(r.missing[0].key,'accord');});
+test('une preuve booléenne true reste présente',()=>{const p=base();p.documents.accord=true;assert.equal(d.evaluate(p,policy).missingCount,0);});
