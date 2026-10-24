@@ -2,7 +2,7 @@
  * US-002 : diagnostic déterministe, sans accès Google et sans mutation du dossier.
  */
 const MandatsCompletenessDomain = (() => {
-  const hasValue = value => value !== null && value !== undefined &&
+  const hasValue = value => value !== false && value !== null && value !== undefined &&
     (typeof value !== 'string' || value.trim() !== '') &&
     (!Array.isArray(value) || value.length > 0);
   const allowedStatuses = Object.freeze(['INCOMPLET','A_VERIFIER','PRET_A_INSTRUIRE']);
