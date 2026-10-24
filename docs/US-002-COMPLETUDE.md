@@ -40,3 +40,19 @@ Cette branche part de la branche de US-001 ; une **Pull Request empilée** est c
 **Attention :** US-001 stocke actuellement `Instance_ID` vide tant que le rapprochement avec les instances n'est pas réalisé. En conséquence, la politique de base signale ce champ comme manquant. Le moteur **n'interprète pas** un champ vide comme une instance vérifiée et ne peut pas rattacher automatiquement une pièce Drive. Les obligations documentaires restent à définir par instance.
 
 Le diagnostic n'écrit rien dans les tables sources et ne change jamais le statut de candidature. Son retour contient des identifiants techniques de candidatures et des intitulés de champs manquants ; restreindre l'accès à l'environnement de test et ne pas publier le résultat dans GitHub.
+
+## Exigences documentaires par instance — incrément 3
+
+Une feuille **`Exigences_instances`** peut être définie dans le classeur de TEST avec les colonnes exactes :
+`INSTANCE_ID`, `Document_code`, `Document_libelle`, `Obligatoire`, `Validation_metier`.
+
+Les deux indicateurs acceptent uniquement **oui** ou **non**. Le moteur refuse les lignes ambiguës ou les doublons d'une même règle.
+
+- Règles documentaires **absentes ou non validées** : un dossier autrement complet demeure `A_VERIFIER`.
+- Pièce **explicitement obligatoire**, absente du dossier : `INCOMPLET`.
+- Pièce **facultative** et politique validée : aucune pièce manquante ajoutée.
+- La vérification du contenu, de l'authenticité et des accès aux justificatifs est **hors périmètre de ce lot**.
+
+⚠️ US-002 ne dispose pas encore d'un adaptateur documentaire Drive qui atteste la présence des pièces. La projection du dossier utilise donc `documents: {}` ; une pièce obligatoire est considérée absente. Aucun document réel n'est consulté ou téléchargé.
+
+Ce module ne prend jamais de décision officielle. La politique doit être validée par l'UR CFTC Bretagne pour chaque instance avant utilisation sur données réelles.
