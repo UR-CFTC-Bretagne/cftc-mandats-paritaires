@@ -26,3 +26,12 @@ Les modules `candidatures`, `personnes`, `instances`, `decisions`, `mandats`, `d
 
 ## Limites
 Les écritures multi-feuilles Sheets ne sont pas transactionnelles. Le rapprochement des réponses modifiées, la gestion d'un identifiant natif Google Forms et la recette réelle restent à traiter avant production.
+
+## Garde-fous exécutables (Sprint 1)
+- `npm run check` lance le contrôle de syntaxe et `scripts/check-architecture.js`.
+- Le garde-fou interdit toute API Google Workspace dans les fichiers `*Domain.gs` et refuse plusieurs `onOpen`.
+- `tests/sheets-repository.test.js` exécute l'adaptateur sur des doubles Google Sheets en mémoire : schémas, réutilisation, contrôles des doublons et reprise des audits.
+- L'adaptateur d'infrastructure est vérifié sans accéder aux données réelles.
+
+### Limites des garde-fous
+Les contrôles statiques reposent sur des expressions régulières, et non sur un AST : ils ne remplacent ni revue de code ni tests de bout en bout. L'infrastructure, l'orchestrateur et les entrées de menu peuvent toujours accéder directement à des services Google lorsqu'ils remplissent leur responsabilité, mais les prochains incréments devraient tendre vers une injection explicite des adaptateurs.
