@@ -106,3 +106,14 @@ erDiagram
 Le module `src/DecisionDomain.gs` propose l'entité `Decisions` avec les champs : `DECISION_ID`, `CAND_ID`, `Autorite`, `Date_decision`, `Resultat`, `Reference_PV`, `Drive_justificatif_ID`, `Competence_verifiee`, `Justificatif_verifie`, `Candidature_verifiee`, `Etat`, `Cree_le`. **Ce schéma est une proposition, non une table Sheets créée.**
 
 Les valeurs possibles de `Resultat` sont `VALIDATION`, `REFUS` et `AJOURNEMENT`. L'état initial est `BROUILLON`, distinct de toute décision officielle. Une évolution devra conserver les versions et un journal d'audit durable. Voir [les règles métier US-003](US-003-DECISIONS.md).
+
+## H. Contrats de stockage de TEST pour US-003
+
+Deux tables **optionnelles à ce stade**, non créées en production, sont introduites par `src/DecisionRepository.gs` :
+ 
+| Table | Clé | Colonnes exactes, dans l'ordre | Portée |
+| --- | --- | --- | --- |
+| `Decisions` | `DECISION_ID` | `DECISION_ID`, `CAND_ID`, `Autorite`, `Date_decision`, `Resultat`, `Reference_PV`, `Drive_justificatif_ID`, `Competence_verifiee`, `Justificatif_verifie`, `Candidature_verifiee`, `Etat`, `Cree_le` | Brouillons US-003, classeur TEST uniquement |
+| `Audit_Decisions` | `EVENT_ID` | `EVENT_ID`, `Date`, `DECISION_ID`, `Action`, `Acteur`, `Champs`, `Statut` | Intention et confirmation technique, TEST uniquement |
+
+Les identifiants de décision doivent être uniques et référencer une candidature existante. Le stockage est append-only pour ce premier incrément ; les règles de versionnement et de corrections ultérieures restent à concevoir. Les états de décision ne doivent jamais être confondus avec une désignation officielle.
