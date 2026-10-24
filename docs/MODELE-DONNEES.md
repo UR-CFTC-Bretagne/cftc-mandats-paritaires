@@ -100,3 +100,9 @@ erDiagram
 - Réconciliation des historiques existants et stratégie de migration.
 
 **Références :** [README / cahier des charges](../README.md), [architecture](ARCHITECTURE.md), [US-001](US-001-INSTALLATION.md), [US-002](US-002-COMPLETUDE.md).
+
+## G. Extension préparatoire — décisions US-003
+
+Le module `src/DecisionDomain.gs` propose l'entité `Decisions` avec les champs : `DECISION_ID`, `CAND_ID`, `Autorite`, `Date_decision`, `Resultat`, `Reference_PV`, `Drive_justificatif_ID`, `Competence_verifiee`, `Justificatif_verifie`, `Candidature_verifiee`, `Etat`, `Cree_le`. **Ce schéma est une proposition, non une table Sheets créée.**
+
+Les valeurs possibles de `Resultat` sont `VALIDATION`, `REFUS` et `AJOURNEMENT`. L'état initial est `BROUILLON`, distinct de toute décision officielle. Une évolution devra conserver les versions et un journal d'audit durable. Voir [les règles métier US-003](US-003-DECISIONS.md).
