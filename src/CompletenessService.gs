@@ -2,10 +2,10 @@
 const MandatsCompletenessService = (() => {
   const C=MANDATS_CONFIG,R=MandatsSheetsRepository,D=MandatsCompletenessDomain;
   const P=MandatsCompletenessProjection,Policy=MandatsCompletenessPolicy;
-  function evaluateSnapshot(people, applications, instanceRows, requirementRows, evidenceRows) {
+  function evaluateSnapshot(people, applications, instanceRows, requirementRows, evidenceRows, verifyFile) {
     const registry=MandatsInstanceRegistry.fromRows(instanceRows || []);
     const requirements=MandatsInstanceRequirements.fromRows(requirementRows || []);
-    const evidence=MandatsDocumentEvidence.fromRows(evidenceRows || []);
+    const evidence=MandatsDocumentEvidence.fromRows(evidenceRows || [],verifyFile);
     return P.inspectRows(people,applications,Policy,D,registry,requirements,evidence);
   }
   function simulationTest() {
@@ -21,7 +21,9 @@ const MandatsCompletenessService = (() => {
     const requirementsRows=R.readTable(requirementsSheet,MandatsInstanceRequirements.HEADERS);
     const evidenceSheet=book.getSheetByName('Pieces_candidatures');
     const evidenceRows=R.readTable(evidenceSheet,MandatsDocumentEvidence.HEADERS);
-    const diagnostics=evaluateSnapshot(persons,applications,instanceRows,requirementsRows,evidenceRows);
+    const enabled=PropertiesService.getScriptProperties().getProperty('ALLOW_TEST_DRIVE_METADATA_READ')==='YES';
+    const verifier=enabled ? MandatsDriveMetadataAdapter.isAccessibleFile : undefined;
+    const diagnostics=evaluateSnapshot(persons,applications,instanceRows,requirementsRows,evidenceRows,verifier);
     const summary={total:diagnostics.length,INCOMPLET:0,A_VERIFIER:0,
       PRET_A_INSTRUIRE:0,ANOMALIE_REFERENTIEL:0};
     for(const row of diagnostics)summary[row.status]++;
