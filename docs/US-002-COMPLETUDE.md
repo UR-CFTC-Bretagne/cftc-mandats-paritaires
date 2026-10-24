@@ -56,3 +56,18 @@ Les deux indicateurs acceptent uniquement **oui** ou **non**. Le moteur refuse l
 ⚠️ US-002 ne dispose pas encore d'un adaptateur documentaire Drive qui atteste la présence des pièces. La projection du dossier utilise donc `documents: {}` ; une pièce obligatoire est considérée absente. Aucun document réel n'est consulté ou téléchargé.
 
 Ce module ne prend jamais de décision officielle. La politique doit être validée par l'UR CFTC Bretagne pour chaque instance avant utilisation sur données réelles.
+
+## Métadonnées de justificatifs — incrément 4
+
+La feuille facultative `Pieces_candidatures` du **classeur TEST** utilise les colonnes exactes :
+`CAND_ID`, `Document_code`, `Drive_file_ID`, `Controle`, `Validation_metier`.
+
+- `Controle` : `present`, `absent` ou `a_verifier` ;
+- `Validation_metier` : `oui` ou `non` ;
+- une preuve compte comme présente **uniquement** si la référence de fichier est non vide, `Controle=present` et `Validation_metier=oui` ;
+- doublons et statuts inconnus bloquent le diagnostic. Aucun contenu de pièce n'est lu ou exposé dans les résultats.
+- en l'absence de feuille ou de ligne correspondante, toute pièce obligatoire reste manquante.
+
+**Limite importante :** il s'agit d'une **attestation déclarative issue du classeur TEST**, et non d'une vérification par Google Drive. Ni l'existence, ni les droits d'accès, ni l'authenticité du fichier ne sont vérifiés. Le raccordement direct à Drive, la preuve de contrôle et les habilitations restent à spécifier et tester avant utilisation réelle.
+
+La sortie du moteur comprend uniquement des indicateurs documentaires et identifiants techniques de candidatures. Ne pas afficher les `Drive_file_ID` dans les rapports.
