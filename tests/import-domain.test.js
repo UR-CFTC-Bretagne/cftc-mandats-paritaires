@@ -29,3 +29,13 @@ test('des dates différentes produisent des identités de soumission distinctes'
  const b={...a,date:'2026-01-02T09:00:00'};
  assert.notEqual(d.identityKey(a),d.identityKey(b));
 });
+
+test('détecte des Source_ID dupliqués dans le référentiel',()=>{
+ assert.deepEqual(d.duplicateSourceIds(['a','b','a','b','c']),['a','b']);
+});
+test('identifie les audits manquants après interruption',()=>{
+ assert.deepEqual(d.missingAudits(['a','b','b','c'],['a','c']),['b']);
+});
+test('ne restaure pas deux fois un audit réparé',()=>{
+ assert.deepEqual(d.missingAudits(['a','b'],['a','b']),[]);
+});
