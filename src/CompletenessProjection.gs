@@ -11,7 +11,7 @@ const MandatsCompletenessProjection = (() => {
       documents: {}, verified: {}
     };
   }
-  function inspectRows(people, applications, policy, domain) {
+  function inspectRows(people, applications, policy, domain, instanceRegistry) {
     const byId = new Map();
     for (const row of people) {
       const id = String(row[0] || '').trim();
@@ -27,7 +27,12 @@ const MandatsCompletenessProjection = (() => {
       if (!person) return {candidatureId:id,status:'ANOMALIE_REFERENTIEL',missing:[],
         verificationPending:[],missingCount:0,pendingCount:0,
         diagnostic:'PERSONNE_INTRouvable'};
-      const result = domain.evaluate(project(person,row),policy);
+      const dossier = project(person,row);
+      if (instanceRegistry && dossier.instance) {
+        const instance = instanceRegistry.find(dossier.instance);
+        if (!instance || !instance.active || !instance.validated) dossier.instance = '';
+      }
+      const result = domain.evaluate(dossier,policy);
       return {candidatureId:id,status:result.status,missing:result.missing,
         verificationPending:result.verificationPending,missingCount:result.missingCount,
         pendingCount:result.pendingCount};
