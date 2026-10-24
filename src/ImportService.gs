@@ -24,6 +24,8 @@ const MandatsImportService=(()=>{
  function indexes(personRows,candRows){
   const people={},candidates={};
   personRows.forEach(r=>{const email=D.clean(r[3]).toLowerCase();if(email)(people[email] ||= []).push({id:r[0],nom:r[1],prenom:r[2]});});
+  const duplicateIds=D.duplicateSourceIds(candRows.map(r=>r[3]));
+  if(duplicateIds.length)throw new Error('Référentiel incohérent : Source_ID présent plusieurs fois ('+duplicateIds.length+')');
   candRows.forEach(r=>{if(r[3])candidates[String(r[3])]=true;});
   return {people,candidates};
  }
@@ -67,6 +69,14 @@ const MandatsImportService=(()=>{
   else readTarget(sh,headers);
   return sh;
  }
+ function repairAudit(target, auditSheet, candidateSheet){
+  // Post-crash repair: only add missing audit records, never create a candidate.
+  const candidates=readTarget(candidateSheet,C.CAND_HEADERS).map(r=>r[3]);
+  const audit=readTarget(auditSheet,C.AUDIT_HEADERS);
+  const missing=D.missingAudits(candidates,audit.filter(r=>r[1]==='IMPORT'||r[1]==='RECONCILIATION').map(r=>r[2]));
+  missing.forEach(id=>auditSheet.appendRow([new Date(),'RECONCILIATION',id,'OK','Trace restaurée depuis Candidatures']));
+  return missing.length;
+ }
  function simulation(){
   const report=summary(prepare().items);
   Logger.log(JSON.stringify(report)); // Identifiants techniques et erreurs uniquement
@@ -84,6 +94,8 @@ const MandatsImportService=(()=>{
      c=ensureSheet(ss,C.TARGET_CANDIDATURES,C.CAND_HEADERS),
      a=ensureSheet(ss,C.TARGET_AUDIT,C.AUDIT_HEADERS);
    const idx=indexes(readTarget(p,C.PERSON_HEADERS),readTarget(c,C.CAND_HEADERS));
+   // Repair an interrupted run where candidate persisted but audit write failed.
+   const repaired=repairAudit(ss,a,c);
    const now=new Date();let imported=0,skipped=0;
    for(const item of state.items){
     const v=item.record.value,decision=D.evaluate(item.record,idx.people,idx.candidates);
@@ -100,7 +112,7 @@ const MandatsImportService=(()=>{
     a.appendRow([now,'IMPORT',v.sourceId,'OK','Candidature enregistrée']);
     imported++;
    }
-   return {importees:imported,ignorees:skipped};
+   return {importees:imported,ignorees:skipped,audits_repares:repaired};
   }finally{lock.releaseLock();}
  }
  return Object.freeze({simulation,executeTest});
