@@ -2,7 +2,7 @@
 const MandatsDocumentEvidence=(()=>{
  const HEADERS=Object.freeze(['CAND_ID','Document_code','Drive_file_ID','Controle','Validation_metier']);
  const norm=v=>String(v==null?'':v).trim().toLocaleLowerCase('fr');
- function fromRows(rows){
+ function fromRows(rows, verifyFile){
   if(!Array.isArray(rows))throw new Error('Métadonnées documentaires invalides');
   const byCandidate=new Map(),seen=new Set();
   for(const row of rows){
@@ -17,7 +17,8 @@ const MandatsDocumentEvidence=(()=>{
     throw new Error('Statut documentaire invalide');
    // A file reference is only usable after an explicit business validation.
    // This does not verify Drive permissions, existence, content or authenticity.
-   const usable=!!fileId&&control==='present'&&validated==='oui';
+   const attested=!!fileId&&control==='present'&&validated==='oui';
+   const usable=attested && typeof verifyFile==='function' && verifyFile(fileId)===true;
    const dossier=byCandidate.get(id)||{};
    dossier[code]=usable ? true : false;
    byCandidate.set(id,dossier);
