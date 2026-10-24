@@ -47,6 +47,20 @@ const MandatsImportDomain = (() => {
       return {action:'REJET',reason:'identité différente pour ce courriel'};
     return {action:'IMPORT',personId:matches.length?matches[0].id:null};
   }
-  return Object.freeze({clean,normalize,emailValid,mapping,record,evaluate,identityKey,decideBatch});
+  // Reconciliation of audit entries without writing a duplicate candidature.
+  function missingAudits(candidateIds,auditIds){
+    const seen=new Set(auditIds.map(clean).filter(Boolean));
+    return [...new Set(candidateIds.map(clean).filter(Boolean))].filter(id=>!seen.has(id));
+  }
+  // Stop before writes if multiple reference rows share one source identifier.
+  function duplicateSourceIds(ids){
+    const seen=new Set(),duplicates=new Set();
+    ids.map(clean).filter(Boolean).forEach(id=>{
+      if(seen.has(id))duplicates.add(id);
+      seen.add(id);
+    });
+    return [...duplicates];
+  }
+  return Object.freeze({clean,normalize,emailValid,mapping,record,evaluate,identityKey,decideBatch,missingAudits,duplicateSourceIds});
 })();
 if(typeof module!=='undefined')module.exports=MandatsImportDomain;
