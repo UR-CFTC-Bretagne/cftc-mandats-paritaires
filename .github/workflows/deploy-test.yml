@@ -1,0 +1,61 @@
+name: Continuous Delivery - Apps Script TEST
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: apps-script-test
+  cancel-in-progress: false
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apps-script-build
+          path: dist/
+          retention-days: 7
+  deploy-test:
+    needs: quality
+    runs-on: ubuntu-latest
+    environment: apps-script-test
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: apps-script-build
+          path: dist/
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verify deployment configuration
+        env:
+          SCRIPT_ID: ${{ secrets.APPS_SCRIPT_TEST_ID }}
+          CLASPRC: ${{ secrets.CLASPRC_JSON }}
+        run: |
+          test -n "$SCRIPT_ID" || { echo "::error::APPS_SCRIPT_TEST_ID missing"; exit 1; }
+          test -n "$CLASPRC" || { echo "::error::CLASPRC_JSON missing"; exit 1; }
+          node -e "const j=JSON.parse(process.env.CLASPRC);if(!j.tokens&&!j.token)process.exit(1)"
+      - name: Configure clasp credentials and target
+        env:
+          SCRIPT_ID: ${{ secrets.APPS_SCRIPT_TEST_ID }}
+          CLASPRC: ${{ secrets.CLASPRC_JSON }}
+        run: |
+          printf '%s' "$CLASPRC" > "$HOME/.clasprc.json"
+          chmod 600 "$HOME/.clasprc.json"
+          node -e "require('fs').writeFileSync('.clasp.json',JSON.stringify({scriptId:process.env.SCRIPT_ID,rootDir:'dist'}))"
+      - name: Push code to TEST Apps Script project
+        run: |
+          npm install --no-save --ignore-scripts @google/clasp@2.5.0
+          npx clasp push --force
+      - name: Remove local credentials
+        if: always()
+        run: rm -f "$HOME/.clasprc.json" .clasp.json
