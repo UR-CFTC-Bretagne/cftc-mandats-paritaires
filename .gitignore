@@ -54,3 +54,6 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# Paquet Apps Script généré par CI/CD
+dist/
