@@ -10,6 +10,9 @@ const MandatsDecisionService=(()=>{
   return {book:SpreadsheetApp.openById(settings.targetId)};
  }
  function snapshot(book){
+  const candidateSheet=book.getSheetByName('Candidatures');
+  if(!candidateSheet || candidateSheet.getLastRow()<1)
+    throw Error('Feuille Candidatures de TEST absente ou sans en-têtes');
   return {
    candidates:MandatsSheetsRepository.readTable(book.getSheetByName('Candidatures'),MANDATS_CONFIG.CAND_HEADERS),
    decisions:MandatsSheetsRepository.readTable(book.getSheetByName('Decisions'),Repo.DECISION_HEADERS),
