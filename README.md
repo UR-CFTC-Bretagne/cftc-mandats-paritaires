@@ -163,6 +163,8 @@ La chaîne GitHub Actions vérifie automatiquement chaque Pull Request et prépa
 
 Voir [procédure de déploiement continu](docs/DEPLOIEMENT-CONTINU.md) et [workflow de livraison TEST](.github/workflows/deploy-test.yml).
 
+**Passage en production du MVP :** réservé à une revue formelle des critères de recette et à un workflow manuel protégé ; voir [checklist MVP et publication](docs/MVP-MISE-EN-PRODUCTION.md) et [workflow de publication production](.github/workflows/deploy-production.yml).
+
 ## 5. Cahier des charges technique
 
 ### 5.1 Socle retenu
