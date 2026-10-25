@@ -1,0 +1,67 @@
+name: Manual production release - MVP
+on:
+  workflow_dispatch:
+    inputs:
+      approval:
+        description: "Enter DEPLOY_MVP_PRODUCTION after signing off the MVP release checklist"
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: apps-script-production
+  cancel-in-progress: false
+jobs:
+  quality:
+    if: github.ref == 'refs/heads/main' && github.repository == 'UR-CFTC-Bretagne/cftc-mandats-paritaires' && inputs.approval == 'DEPLOY_MVP_PRODUCTION'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apps-script-production-package
+          path: dist/
+          retention-days: 7
+  deploy-production:
+    needs: quality
+    if: github.ref == 'refs/heads/main' && github.repository == 'UR-CFTC-Bretagne/cftc-mandats-paritaires' && inputs.approval == 'DEPLOY_MVP_PRODUCTION'
+    runs-on: ubuntu-latest
+    environment: apps-script-production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: actions/download-artifact@v4
+        with:
+          name: apps-script-production-package
+          path: dist/
+      - name: Verify release controls
+        env:
+          APPROVED: ${{ vars.MVP_RELEASE_APPROVED }}
+          PROD_ID: ${{ secrets.APPS_SCRIPT_PRODUCTION_ID }}
+          CONFIRMED_ID: ${{ vars.CONFIRMED_PRODUCTION_SCRIPT_ID }}
+          TEST_ID: ${{ vars.CONFIRMED_TEST_SCRIPT_ID }}
+          CLASPRC: ${{ secrets.CLASPRC_PRODUCTION_JSON }}
+        run: node scripts/verify-production-deploy.js
+      - name: Configure isolated production credentials
+        env:
+          PROD_ID: ${{ secrets.APPS_SCRIPT_PRODUCTION_ID }}
+          CLASPRC: ${{ secrets.CLASPRC_PRODUCTION_JSON }}
+        run: |
+          printf '%s' "$CLASPRC" > "$HOME/.clasprc.json"
+          chmod 600 "$HOME/.clasprc.json"
+          node -e "require('fs').writeFileSync('.clasp.json',JSON.stringify({scriptId:process.env.PROD_ID,rootDir:'dist'}))"
+      - name: Push reviewed code to production project
+        run: |
+          npm install --no-save --ignore-scripts @google/clasp@2.5.0
+          npx clasp push --force
+      - name: Remove credentials
+        if: always()
+        run: rm -f "$HOME/.clasprc.json" .clasp.json
