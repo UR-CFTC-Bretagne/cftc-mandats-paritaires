@@ -171,6 +171,10 @@ L'application privilégie une **interface métier interne** séparant les opéra
 
 Une API REST externe ou une migration vers PostgreSQL ne fait pas partie du MVP initial et nécessitera une revue de sécurité et une recette spécifiques. Voir [contrat d'API interne](docs/API-INTERNE.md).
 
+### 4.7 API-002 — Habilitations par rôle et territoire
+
+Un prototype `AccessPolicy.gs` introduit le refus par défaut, les contrôles régionaux/UD/syndicats/mandatés et le filtrage de colonnes. Les décisions nécessitent une autorisation UR spécifique. Les rattachements serveur, l'authentification réelle, l'audit durable et le raccordement au service `DataAccess.gs` restent à développer. Voir [API-002 — Habilitations](docs/API-002-HABILITATIONS.md).
+
 ## 5. Cahier des charges technique
 
 ### 5.1 Socle retenu
