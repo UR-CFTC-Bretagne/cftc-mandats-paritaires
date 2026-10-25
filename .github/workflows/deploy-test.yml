@@ -26,6 +26,7 @@ jobs:
           retention-days: 7
   deploy-test:
     needs: quality
+    if: github.ref == 'refs/heads/main' && github.repository == 'UR-CFTC-Bretagne/cftc-mandats-paritaires'
     runs-on: ubuntu-latest
     environment: apps-script-test
     steps:
