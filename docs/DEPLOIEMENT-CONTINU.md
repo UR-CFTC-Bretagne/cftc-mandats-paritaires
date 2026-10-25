@@ -11,9 +11,13 @@
 
 Dans Settings > Environments, créer `apps-script-test`. Limiter les branches autorisées à `main`. Recommandé : imposer une approbation humaine initiale lors de la recette, puis l'enlever uniquement quand les garanties et le schéma TEST sont validés.
 
+Configurer la **variable d'environnement** `ALLOW_TEST_CODE_DEPLOY=YES` pour autoriser explicitement le transfert du code vers TEST. Toute autre valeur bloque le job.
+
 Configurer comme **secrets de l'environnement** :
 - `APPS_SCRIPT_TEST_ID` : identifiant du projet Apps Script **de test** (différent de la production).
 - `CLASPRC_JSON` : contenu JSON des identifiants OAuth clasp obtenus par l'administrateur autorisé. Les préserver exclusivement dans GitHub Secrets et renouveler/révoquer les jetons selon la procédure interne.
+
+Le workflow bloque le job de déploiement si la référence Git n'est pas `main`, si le dépôt n'est pas celui de l'UR CFTC Bretagne ou si le manifeste comporte une permission Drive. Cela ne dispense pas de vérifier l'identifiant du projet TEST et ses habilitations avant l'activation.
 
 Ces deux secrets sont indispensables. Sans eux, le job de livraison échoue explicitement et ne touche aucun projet Apps Script.
 
