@@ -92,21 +92,56 @@ Les sprints sont **prévisionnels**. Le périmètre exact, les dépendances et l
 - Paramétrage des organismes, des règles de désignation et des destinataires.
 - Exports et indicateurs autorisés, minimisés et limités aux besoins métier.
 
-## 4. Modèle de données cible
+## 4. Modèle de données : référentiel, relations et évolutions
 
-| Entité | Champs structurants (indicatifs) | Relation principale |
+Le modèle repose sur des **identifiants techniques stables**, une séparation des candidatures et des mandats, des validations métier explicites et des liens documentaires contrôlés. Il distingue les tables réellement prévues par les modules US-001/US-002 des objets métiers futurs.
+
+### 4.1 Modèle relationnel simplifié
+
+```mermaid
+erDiagram
+    PERSONNES ||--o{ CANDIDATURES : depose
+    INSTANCES ||--o{ CANDIDATURES : sollicite
+    INSTANCES ||--o{ EXIGENCES_INSTANCES : definit
+    CANDIDATURES ||--o{ PIECES_CANDIDATURES : contient
+    CANDIDATURES ||--o{ DECISIONS : instruit
+    PERSONNES ||--o{ MANDATS : exerce
+    INSTANCES ||--o{ MANDATS : concerne
+    DECISIONS ||--o{ MANDATS : autorise
+    MANDATS ||--o{ DOCUMENTS : documente
+    MANDATS ||--o{ NOTIFICATIONS : notifie
+```
+
+Les cardinalités relatives aux **décisions et mandats** sont des hypothèses de cadrage à confirmer, notamment pour les renouvellements et désignations successives.
+
+### 4.2 Tables des incréments US-001 / US-002
+
+| Table | Identifiant ou clé | Responsabilité | Avancement |
+| --- | --- | --- | --- |
+| `Personnes` | `PERSONNE_ID` | Personne physique et rattachements syndicaux | Contrat US-001 |
+| `Candidatures` | `CAND_ID` ; unicité de `Source_ID` | Réception, source et état initial | Contrat US-001 |
+| `Audit_Imports` | Pas encore de clé propre | Traçabilité technique des synchronisations | Contrat US-001 |
+| `Instances` | `INSTANCE_ID` | Référentiel des organismes et validation métier | Contrat US-002 |
+| `Exigences_instances` | `INSTANCE_ID` + `Document_code` | Règles de justificatifs par instance | Contrat US-002 |
+| `Pieces_candidatures` | `CAND_ID` + `Document_code` | Références et contrôles de justificatifs | Contrat US-002 |
+
+Les tables US-002 sont prises en charge par le **code de développement**, sans validation d'un déploiement dans le classeur réel. Le champ `Instance_ID` n'est pas encore alimenté automatiquement par US-001. Le statut de complétude ne constitue jamais une décision de mandatement.
+
+### 4.3 Entités futures
+
+| Entité cible | Finalité | User stories |
 | --- | --- | --- |
-| Personnes | PERSONNE_ID, nom, prénom, courriel, syndicat, UD | 1 personne → plusieurs candidatures/mandats |
-| Candidatures | CAND_ID, PERSONNE_ID, source, Source_ID, instance, statut, réception | Liées à une personne et éventuellement une décision |
-| Instances | INSTANCE_ID, dénomination, contacts, autorité compétente, règles | 1 instance → plusieurs mandats |
-| Décisions | DECISION_ID, candidature, autorité, date, référence PV, résultat, justificatif vérifié | Justifie une désignation |
-| Mandats | MANDAT_ID, personne, instance, décision, fonction, début, fin, statut | Cycle de vie d'une désignation |
-| Organisations | ORG_ID, type, nom, département, coordonnées | Syndicat, UD et partenaires pertinents |
-| Documents | DOCUMENT_ID, type, version modèle, Drive ID, statut | Attachés à une décision ou un mandat |
-| Notifications | NOTIF_ID, destinataire, type, brouillon ID, statut | Liées au dossier correspondant |
-| Audit | date, acteur, action, objet, détails minimisés | Traçabilité sans exposition inutile de données |
+| `Organisations` | Syndicats, UD et correspondants | Transversal |
+| `Decisions` | Autorités, résultats, références de PV et preuves | US-003 / US-004 |
+| `Mandats` | Désignations, fonctions, dates, suivi et renouvellements | US-004 / US-010 |
+| `Documents` | Contrats, extraits PV, courriers, versions | US-005 à US-007 |
+| `Notifications` | Préparation, validation et suivi des communications | US-008 / US-009 |
+| `Echeances` et `Comptes_rendus` | Délais, alertes et suivi des travaux d'instance | US-010 / US-011 |
+| `Journal_metier` | Historique métier distinct de l'audit technique | Transversal |
 
-**Source de vérité à définir par entité.** La structure du référentiel doit être versionnée avec des migrations non destructives et des tests de compatibilité. Les valeurs réelles des champs et règles métier ne sont pas encore entièrement validées.
+**Règles de conception :** aucune clé fondée seulement sur le nom ou le courriel ; références contrôlées ; refus des identifiants ambigus ; séparation des statuts techniques et des décisions officielles ; schémas versionnés, migrations testées et données confidentielles hors GitHub.
+
+**Documentation de référence : [modèle de données détaillé, colonnes, contraintes et hypothèses](docs/MODELE-DONNEES.md).** Toute modification du modèle doit mettre à jour cette spécification et les tests de non-régression.
 
 ## 5. Cahier des charges technique
 

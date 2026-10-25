@@ -11,7 +11,7 @@ const MandatsCompletenessProjection = (() => {
       documents: {}, verified: {}
     };
   }
-  function inspectRows(people, applications, policy, domain, instanceRegistry) {
+  function inspectRows(people, applications, policy, domain, instanceRegistry, requirements, evidence) {
     const byId = new Map();
     for (const row of people) {
       const id = String(row[0] || '').trim();
@@ -32,7 +32,17 @@ const MandatsCompletenessProjection = (() => {
         const instance = instanceRegistry.find(dossier.instance);
         if (!instance || !instance.active || !instance.validated) dossier.instance = '';
       }
-      const result = domain.evaluate(dossier,policy);
+      if (evidence) dossier.documents=evidence.forCandidature(id);
+      const docRule=requirements ? requirements.forInstance(dossier.instance) : null;
+      const effectivePolicy=docRule && docRule.status==='VALIDE'
+        ? {fields:policy.fields,documents:docRule.documents} : policy;
+      const result=domain.evaluate(dossier,effectivePolicy);
+      if(requirements && (!docRule || docRule.status!=='VALIDE') &&
+          result.status==='PRET_A_INSTRUIRE'){
+        result.status='A_VERIFIER';result.complete=false;
+        result.verificationPending.push({key:'regles_documentaires',label:'Règles documentaires de l’instance à valider'});
+        result.pendingCount++;
+      }
       return {candidatureId:id,status:result.status,missing:result.missing,
         verificationPending:result.verificationPending,missingCount:result.missingCount,
         pendingCount:result.pendingCount};
