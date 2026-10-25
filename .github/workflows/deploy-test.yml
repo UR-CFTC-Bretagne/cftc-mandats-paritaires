@@ -30,10 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: apps-script-test
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: apps-script-build
-          path: dist/
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -45,7 +42,10 @@ jobs:
             echo "::error::Environment apps-script-test must have ALLOW_TEST_CODE_DEPLOY=YES"
             exit 1
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: apps-script-build
+          path: dist/
       - name: Verify deployment configuration without exposing secrets
         env:
           APPS_SCRIPT_TEST_ID: ${{ secrets.APPS_SCRIPT_TEST_ID }}
