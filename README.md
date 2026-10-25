@@ -157,6 +157,12 @@ Le domaine `DesignationGuard.gs` définit des transitions préparatoires (`BROUI
 
 **Aucun document officiel ni notification n'est autorisé par ce module**, même si les contrôles préalables sont satisfaits. Le workflow n'est pas encore enregistré dans Sheets : il nécessite un circuit d'habilitation, de validation humaine et d'audit avant mise en production. Voir [US-004 — garde-fou de désignation](docs/US-004-BLOCAGE-DESIGNATIONS.md).
 
+### 4.5 Livraison et déploiement continus (CI/CD)
+
+La chaîne GitHub Actions vérifie automatiquement chaque Pull Request et prépare un déploiement continu du **code Apps Script sur le projet TEST uniquement** après intégration dans `main`. L'environnement GitHub `apps-script-test` utilise des secrets `APPS_SCRIPT_TEST_ID` et `CLASPRC_JSON` à configurer ; aucun déploiement de production n'est automatisé. La synchronisation ne déclenche ni désignation ni notification.
+
+Voir [procédure de déploiement continu](docs/DEPLOIEMENT-CONTINU.md) et [workflow de livraison TEST](.github/workflows/deploy-test.yml).
+
 ## 5. Cahier des charges technique
 
 ### 5.1 Socle retenu
