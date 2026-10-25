@@ -36,3 +36,11 @@ Le déclencheur exige de renseigner exactement `DEPLOY_MVP_PRODUCTION`. Le job c
 Au terme de la recette, inscrire dans un ticket GitHub privé ou le registre de validation interne : version Git exacte, date, autorité décisionnaire, résultat des tests, sauvegarde vérifiée, état des habilitations et plan de retour arrière. Ne pas publier de données personnelles ou de justificatifs dans le dépôt public.
 
 Aucun contrôle automatique ne remplace la confirmation formelle par les responsables habilités.
+
+## Approbation exprimée dans la conversation de suivi
+
+La décision d'approuver une version du MVP peut être communiquée explicitement dans les échanges avec le coordinateur. Avant publication, la demande doit préciser **le commit Git exact**, le périmètre fonctionnel, la cible Apps Script, le résultat de recette et les réserves éventuelles. Une consigne générale comme « dès que c'est prêt » définit le processus, mais **n'approuve aucune version précise**.
+
+L'accord donné dans la conversation doit être consigné dans le registre interne de validation sous une forme vérifiable (sans y publier de données personnelles ni de secrets), puis rapproché de la checklist et du commit déployé. Les mécanismes de contrôle GitHub restent obligatoires, notamment l'approbation technique de l'environnement de production lorsqu'elle est exigée. L'approbation conversationnelle ne contourne jamais ces contrôles ni les validations statutaires de l'UR.
+
+En cas de modification du commit candidat après validation, une nouvelle vérification et, si nécessaire, une nouvelle approbation sont requises.
