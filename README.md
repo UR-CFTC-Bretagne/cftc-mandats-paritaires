@@ -165,6 +165,12 @@ Voir [procédure de déploiement continu](docs/DEPLOIEMENT-CONTINU.md) et [workf
 
 **Passage en production du MVP :** réservé à une revue formelle des critères de recette et à un workflow manuel protégé ; voir [checklist MVP et publication](docs/MVP-MISE-EN-PRODUCTION.md) et [workflow de publication production](.github/workflows/deploy-production.yml).
 
+### 4.6 Architecture API-first interne — API-001
+
+L'application privilégie une **interface métier interne** séparant les opérations autorisées du stockage Google Sheets. Le premier module `DataAccess.gs` propose des lectures contrôlées par identité serveur, autorisation explicite et audit obligatoire ; il n'expose **aucun endpoint HTTP**. Les services US-001 à US-004 ne sont pas encore migrés vers cette interface.
+
+Une API REST externe ou une migration vers PostgreSQL ne fait pas partie du MVP initial et nécessitera une revue de sécurité et une recette spécifiques. Voir [contrat d'API interne](docs/API-INTERNE.md).
+
 ## 5. Cahier des charges technique
 
 ### 5.1 Socle retenu
