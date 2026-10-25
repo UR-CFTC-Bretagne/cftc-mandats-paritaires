@@ -11,7 +11,7 @@
 
 Dans Settings > Environments, créer `apps-script-test`. Limiter les branches autorisées à `main`. Recommandé : imposer une approbation humaine initiale lors de la recette, puis l'enlever uniquement quand les garanties et le schéma TEST sont validés.
 
-Configurer la **variable d'environnement** `ALLOW_TEST_CODE_DEPLOY=YES` pour autoriser explicitement le transfert du code vers TEST. Toute autre valeur bloque le job.
+Configurer les **variables d'environnement** `CONFIRMED_TEST_SCRIPT_ID` (copie contrôlée de l'identifiant du projet TEST) et `ALLOW_TEST_CODE_DEPLOY=YES` pour autoriser explicitement le transfert du code vers TEST. Toute autre valeur bloque le job.
 
 Configurer comme **secrets de l'environnement** :
 - `APPS_SCRIPT_TEST_ID` : identifiant du projet Apps Script **de test** (différent de la production).
@@ -44,3 +44,15 @@ La synchronisation `clasp push --force` **remplace le code du projet Apps Script
 ## Statut
 
 Ce dispositif est **préparé sur une branche de développement**. Il ne devient opérationnel sur `main` qu'après revue/fusion de la chaîne de PR, création de l'environnement et des secrets, puis validation du test de bout en bout.
+
+
+## Préflight de déploiement
+
+Le script `scripts/verify-test-deploy.js` valide les paramètres dans le runner avant d'écrire `.clasprc.json` :
+
+- concordance stricte entre `APPS_SCRIPT_TEST_ID` (secret) et `CONFIRMED_TEST_SCRIPT_ID` (variable d'environnement protégée) ;
+- présence et validité structurelle des identifiants OAuth ;
+- conformité du manifeste à la seule permission actuellement approuvée : `https://www.googleapis.com/auth/spreadsheets` ;
+- rejet de toute permission supplémentaire, notamment Drive.
+
+Pour éviter d'exposer des valeurs confidentielles, les erreurs de préflight ne reprennent pas le contenu des secrets ni les identifiants. Les tests automatisés utilisent exclusivement des identifiants fictifs. **La vérification de l'identité du projet cible reste un contrôle organisationnel obligatoire** : une double valeur identique saisie par erreur ne démontre pas la propriété du projet.
