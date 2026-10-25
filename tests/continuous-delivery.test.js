@@ -22,3 +22,18 @@ test('le manifeste est assemblé depuis le dépôt sans secrets',()=>{
  assert.match(build,/\.gs/);
  assert.doesNotMatch(build,/\.clasprc|CLASPRC_JSON/);
 });
+
+test('checkout effectué avant récupération de artefact et aucune suppression du paquet',()=>{
+ const deploy=workflow.slice(workflow.indexOf('  deploy-test:'));
+ const checkout=deploy.indexOf('uses: actions/checkout@v4');
+ const download=deploy.indexOf('uses: actions/download-artifact@v4');
+ assert.ok(checkout>=0 && download>checkout,'checkout doit précéder le paquet');
+ assert.match(deploy,/name: apps-script-build/);
+ assert.match(deploy,/path: dist\//);
+});
+test('workflow manuel ne contourne pas les restrictions sur main',()=>{
+ assert.match(workflow,/workflow_dispatch:/);
+ const deploy=workflow.slice(workflow.indexOf('  deploy-test:'));
+ assert.match(deploy,/if: github\.ref == 'refs\/heads\/main'/);
+ assert.match(deploy,/ALLOW_TEST_CODE_DEPLOY/);
+});
