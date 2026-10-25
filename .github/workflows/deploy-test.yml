@@ -36,6 +36,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Verify explicit TEST deployment authorization
+        env:
+          ENABLED: ${{ vars.ALLOW_TEST_CODE_DEPLOY }}
+        run: |
+          if [ "$ENABLED" != "YES" ]; then
+            echo "::error::Environment apps-script-test must have ALLOW_TEST_CODE_DEPLOY=YES"
+            exit 1
+          fi
       - name: Verify deployment configuration
         env:
           SCRIPT_ID: ${{ secrets.APPS_SCRIPT_TEST_ID }}
@@ -44,6 +52,8 @@ jobs:
           test -n "$SCRIPT_ID" || { echo "::error::APPS_SCRIPT_TEST_ID missing"; exit 1; }
           test -n "$CLASPRC" || { echo "::error::CLASPRC_JSON missing"; exit 1; }
           node -e "const j=JSON.parse(process.env.CLASPRC);if(!j.tokens&&!j.token)process.exit(1)"
+          node -e "if(!/^[A-Za-z0-9_-]{20,}$/.test(process.env.SCRIPT_ID))process.exit(1)"
+          node -e "const fs=require('fs');const m=JSON.parse(fs.readFileSync('dist/appsscript.json'));if(m.runtimeVersion!=='V8'||!Array.isArray(m.oauthScopes)||m.oauthScopes.some(x=>x.includes('drive')))process.exit(1)"
       - name: Configure clasp credentials and target
         env:
           SCRIPT_ID: ${{ secrets.APPS_SCRIPT_TEST_ID }}
