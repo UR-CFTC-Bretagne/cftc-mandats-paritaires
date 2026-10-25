@@ -45,16 +45,13 @@ jobs:
             echo "::error::Environment apps-script-test must have ALLOW_TEST_CODE_DEPLOY=YES"
             exit 1
           fi
-      - name: Verify deployment configuration
+      - uses: actions/checkout@v4
+      - name: Verify deployment configuration without exposing secrets
         env:
-          SCRIPT_ID: ${{ secrets.APPS_SCRIPT_TEST_ID }}
-          CLASPRC: ${{ secrets.CLASPRC_JSON }}
-        run: |
-          test -n "$SCRIPT_ID" || { echo "::error::APPS_SCRIPT_TEST_ID missing"; exit 1; }
-          test -n "$CLASPRC" || { echo "::error::CLASPRC_JSON missing"; exit 1; }
-          node -e "const j=JSON.parse(process.env.CLASPRC);if(!j.tokens&&!j.token)process.exit(1)"
-          node -e "if(!/^[A-Za-z0-9_-]{20,}$/.test(process.env.SCRIPT_ID))process.exit(1)"
-          node -e "const fs=require('fs');const m=JSON.parse(fs.readFileSync('dist/appsscript.json'));if(m.runtimeVersion!=='V8'||!Array.isArray(m.oauthScopes)||m.oauthScopes.some(x=>x.includes('drive')))process.exit(1)"
+          APPS_SCRIPT_TEST_ID: ${{ secrets.APPS_SCRIPT_TEST_ID }}
+          CONFIRMED_TEST_SCRIPT_ID: ${{ vars.CONFIRMED_TEST_SCRIPT_ID }}
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+        run: node scripts/verify-test-deploy.js
       - name: Configure clasp credentials and target
         env:
           SCRIPT_ID: ${{ secrets.APPS_SCRIPT_TEST_ID }}
